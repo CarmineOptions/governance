@@ -1,0 +1,5 @@
+[project]
+protostar-version = '0.13.0'
+
+[contracts]
+governance = ["src"]

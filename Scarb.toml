@@ -9,3 +9,6 @@ version = "0.2.0"
 starknet = ">=1.0.0"
 
 [[target.starknet-contract]]
+
+[scripts]
+test = "protostar test"
