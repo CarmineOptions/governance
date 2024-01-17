@@ -45,6 +45,27 @@ mod Options {
         }
     }
 
+    // Usable after C1 AMM is deployed
+    fn add_options_both_sides(salt: felt252, mut options: Span<FutureOption>) {
+        // TODO use block hash from block_hash syscall as salt // actually doable with the new syscall
+        let governance_address = get_contract_address();
+        let state = Governance::unsafe_new_contract_state();
+        let amm_address = state.get_amm_address();
+        let proxy_class: felt252 =
+            0x00eafb0413e759430def79539db681f8a4eb98cf4196fe457077d694c6aeeb82;
+        let opt_class: felt252 = 0x5ce3a80daeb5b7a766df9b41ca8d9e52b6b0a045a0d2ced72f43d4dd2f93b10;
+        loop {
+            match options.pop_front() {
+                Option::Some(option) => {
+                    add_option_both_sides(
+                        proxy_class, opt_class, governance_address, amm_address, salt, option
+                    );
+                },
+                Option::None(()) => { break (); },
+            };
+        }
+    }
+
     // TODO add auto generation of FutureOption structs once string contacenation exists
     #[derive(Copy, Drop, Serde)]
     struct FutureOption {
@@ -125,7 +146,6 @@ mod Options {
                 o.initial_volatility
             );
     }
-
 
     fn add_1201_options(
         eth_lpt_addr: ContractAddress,
