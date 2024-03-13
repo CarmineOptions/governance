@@ -20,7 +20,6 @@ mod Options {
 
     use cubit::f128::types::{Fixed, FixedTrait};
 
-    use governance::contract::Governance::{amm_address, proposal_initializer_run};
     use governance::constants::{
         OPTION_CALL, OPTION_PUT, TRADE_SIDE_LONG, TRADE_SIDE_SHORT, OPTION_TOKEN_CLASS_HASH
     };
@@ -30,7 +29,6 @@ mod Options {
     use governance::types::OptionSide;
     use governance::contract::Governance;
     use governance::types::OptionType;
-    use governance::contract::Governance::proposal_initializer_runContractMemberStateTrait;
 
     fn add_options(mut options: Span<FutureOption>) {
         // TODO use block hash from block_hash syscall as salt // actually doable with the new syscall

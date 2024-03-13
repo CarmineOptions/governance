@@ -11,8 +11,14 @@ name = "governance"
 version = "0.2.0"
 dependencies = [
  "cubit",
+ "openzeppelin",
  "snforge_std",
 ]
+
+[[package]]
+name = "openzeppelin"
+version = "0.8.1"
+source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.8.1#eb2d32161e2fe4df54feb08e4dcdd154fa30fd0a"
 
 [[package]]
 name = "snforge_std"

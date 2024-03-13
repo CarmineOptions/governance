@@ -29,6 +29,9 @@ trait IGovernance<TContractState> {
 
 // in component
 
+// VESTING
+
+// in component
 // OPTIONS / ONE-OFF
 }
 
@@ -42,14 +45,19 @@ mod Governance {
     use governance::types::PropDetails;
     use governance::upgrades::Upgrades;
     use governance::airdrop::airdrop as airdrop_component;
+    use governance::vesting::vesting as vesting_component;
 
     use starknet::ContractAddress;
 
 
     component!(path: airdrop_component, storage: airdrop, event: AirdropEvent);
+    component!(path: vesting_component, storage: vesting, event: VestingEvent);
 
     #[abi(embed_v0)]
     impl Airdrop = airdrop_component::AirdropImpl<ContractState>;
+
+    #[abi(embed_v0)]
+    impl Vesting = vesting_component::VestingImpl<ContractState>;
 
     #[storage]
     struct Storage {
@@ -68,7 +76,9 @@ mod Governance {
         delegate_hash: LegacyMap::<ContractAddress, felt252>,
         total_delegated_to: LegacyMap::<ContractAddress, u128>,
         #[substorage(v0)]
-        airdrop: airdrop_component::Storage
+        airdrop: airdrop_component::Storage,
+        #[substorage(v0)]
+        vesting: vesting_component::Storage
     }
 
     // PROPOSALS
@@ -77,7 +87,7 @@ mod Governance {
     struct Proposed {
         prop_id: felt252,
         payload: felt252,
-        to_upgrade: ContractType
+        to_upgrade: ContractType,
     }
 
     #[derive(starknet::Event, Drop)]
@@ -92,7 +102,8 @@ mod Governance {
     enum Event {
         Proposed: Proposed,
         Voted: Voted,
-        AirdropEvent: airdrop_component::Event
+        AirdropEvent: airdrop_component::Event,
+        VestingEvent: vesting_component::Event
     }
 
     #[constructor]

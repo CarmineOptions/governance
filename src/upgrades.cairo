@@ -13,9 +13,6 @@ mod Upgrades {
     use starknet::ContractAddress;
     use starknet::class_hash;
     use governance::proposals::Proposals;
-    use governance::contract::Governance::{
-        proposal_applied, amm_address, governance_token_address, proposal_details
-    };
 
     use governance::types::PropDetails;
     use governance::contract::Governance;

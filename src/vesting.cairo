@@ -15,8 +15,9 @@ trait IVesting<TContractState> {
         ref self: TContractState,
         first_vest: u64,
         period: u64,
-        increments_count: u64,
-        total_amount: u128
+        increments_count: u16,
+        total_amount: u128,
+        grantee: ContractAddress
     );
 // MAYBE – streaming?
 // MAYBE – options on the govtoken?
@@ -24,8 +25,13 @@ trait IVesting<TContractState> {
 
 #[starknet::component]
 mod vesting {
-    use starknet::syscalls::get_block_timestamp;
+    use governance::contract::IGovernance;
+    use starknet::get_block_timestamp;
+    use starknet::ContractAddress;
+    use starknet::{get_caller_address, get_contract_address};
 
+    use governance::contract::Governance;
+    use governance::contract::Governance::ContractState;
     use governance::traits::IGovernanceTokenDispatcher;
     use governance::traits::IGovernanceTokenDispatcherTrait;
 
@@ -65,10 +71,11 @@ mod vesting {
             vested_timestamp: u64
         ) {
             let amt_to_vest = self.milestone.read((vested_timestamp, grantee));
-            assert(amt_to_vest != 0, 'no vesting milestone found, or already vested');
+            assert(amt_to_vest != 0, 'nothing to vest');
             assert(get_block_timestamp() > vested_timestamp, 'not yet eligible');
-            IGovernanceTokenDispatcher { contract_address: govtoken_addr }
-                .mint(claimee, u256 { high: 0, low: amt_to_vest });
+            let state = Governance::unsafe_new_contract_state();
+            IGovernanceTokenDispatcher { contract_address: state.get_governance_token_address() }
+                .mint(grantee, amt_to_vest.into());
             self.milestone.write((vested_timestamp, grantee), 0);
             self
                 .emit(
@@ -82,29 +89,30 @@ mod vesting {
             grantee: ContractAddress,
             amount: u128
         ) {
-            self.milestone.write((vested_timestamp, grantee), amount);
+            assert(get_caller_address() == get_contract_address(), 'not self-call');
+            self.milestone.write((vesting_timestamp, grantee), amount);
             self
                 .emit(
                     VestingMilestoneAdded {
-                        grantee: grantee, timestamp: vesting_timestamp, amount: u128
+                        grantee: grantee, timestamp: vesting_timestamp, amount: amount
                     }
                 )
         }
 
         fn add_linear_vesting_schedule(
-            ref self: TContractState,
+            ref self: ComponentState<TContractState>,
             first_vest: u64,
             period: u64,
             increments_count: u16,
             total_amount: u128,
             grantee: ContractAddress
         ) {
+            assert(get_caller_address() == get_contract_address(), 'not self-call');
             let mut i: u16 = 0;
             let mut curr_timestamp = first_vest;
-            assert(increments_count > 1, 'schedule must have more than one milestone');
-            assert(get_block_timestamp() < first_vest, 'first vest cannot be in the past');
-            assert()
-            let per_vest_amount = total_amount / increments_count;
+            assert(increments_count > 1, 'increments_count <= 1');
+            assert(get_block_timestamp() < first_vest, 'first vest can\'t be in the past');
+            let per_vest_amount = total_amount / increments_count.into();
             let mut total_scheduled = 0;
             loop {
                 if i == increments_count {

@@ -1,4 +1,4 @@
-use tests::basic::submit_44_signal_proposals;
+//use tests::basic::submit_44_signal_proposals;
 
 use governance::traits::IAMM;
 use governance::contract::IGovernanceDispatcher;

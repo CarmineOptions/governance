@@ -10,3 +10,5 @@ mod proposals;
 mod traits;
 mod types;
 mod upgrades;
+mod vesting;
+mod govtoken; // if I put this in tests/ , I seem unable to use declare('MyToken')
