@@ -28,7 +28,7 @@ mod airdrop {
     use governance::contract::Governance::ContractState;
     use governance::traits::IGovernanceTokenDispatcher;
     use governance::traits::IGovernanceTokenDispatcherTrait;
-
+        
     #[storage]
     struct Storage {
         airdrop_claimed: LegacyMap::<ContractAddress, u128>,

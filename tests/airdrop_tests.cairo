@@ -1,8 +1,8 @@
 use core::hash::HashStateExTrait;
 use core::{ArrayTrait, SpanTrait};
 use core::debug::PrintTrait;
-use distributor::contract::{Distributor, IDistributorDispatcher, IDistributorDispatcherTrait};
-use Distributor::STRK_ADDRESS;
+use governance::airdrop::{airdrop, IAirdropDispatcher, IAirdropDispatcherTrait};
+use airdrop::STRK_ADDRESS;
 use openzeppelin::token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
 use snforge_std::{ContractClassTrait, declare, start_prank, CheatTarget};
 use starknet::{ContractAddress, deploy_syscall};
@@ -11,15 +11,16 @@ const ADMIN_ADDR: felt252 = 0x42;
 const CLAIMEE_1: felt252 = 0x13;
 const CLAIMEE_2: felt252 = 0x14;
 
-fn deploy() -> IDistributorDispatcher {
+
+fn deploy() -> IAirdropDispatcher {
     let mut calldata = ArrayTrait::new();
     calldata.append(ADMIN_ADDR);
 
-    let contract = declare('Distributor');
-    let address = contract.deploy(@calldata).expect('unable to deploy distributor');
-
-    IDistributorDispatcher { contract_address: address }
+    let contract = declare('Airdrop');
+    let address = contract.deploy().expect('unable to deploy Airdrop');
+    IAirdropDispatcher { contract_address: address }
 }
+
 
 fn deploy_token(recipient: ContractAddress) -> IERC20Dispatcher {
     let mut calldata = ArrayTrait::new();
@@ -36,21 +37,21 @@ fn deploy_token(recipient: ContractAddress) -> IERC20Dispatcher {
 
 #[test]
 fn test_claim_twice_with_same_proof() {
-    let contract = deploy();
-    let tok = deploy_token(contract.contract_address);
-    
-    start_prank(CheatTarget::One(contract.contract_address), ADMIN_ADDR.try_into().unwrap());
-    contract.add_root(valid_root);
-    
-    start_prank(CheatTarget::One(contract.contract_address), CLAIMEE_1.try_into().unwrap());
+    let airdrop_contract = deploy();
+    let token_contract = deploy_token(airdrop_contract.contract_address);
+
+    start_prank(CheatTarget::One(airdrop_contract.contract_address), ADMIN_ADDR.try_into().unwrap());
+    airdrop_contract.add_root(valid_root);
+
+    start_prank(CheatTarget::One(airdrop_contract.contract_address), CLAIMEE_1.try_into().unwrap());
     let initial_proof = array![valid_proof_element];
-    contract.claim(valid_claim_amount, initial_proof.span());
-    assert(tok.balance_of(CLAIMEE_1.try_into().unwrap()) == valid_claim_amount, "First claim failed");
-    
-    
-    contract.claim(valid_claim_amount, initial_proof.span());   
-    assert(tok.balance_of(CLAIMEE_1.try_into().unwrap()) == valid_claim_amount, "Second claimed modified the claimee's balance");
+    airdrop_contract.claim(CLAIMEE_1, valid_claim_amount, initial_proof.span());
+    assert(token_contract.balance_of(CLAIMEE_1.try_into().unwrap()) == valid_claim_amount, "First claim failed");
+
+    airdrop_contract.claim(CLAIMEE_1, valid_claim_amount, initial_proof.span());
+    assert(token_contract.balance_of(CLAIMEE_1.try_into().unwrap()) == valid_claim_amount, "Second claim modified the claimee's balance");
 }
+
 
 #[test]
 #[should_panic(expected: ('INVALID PROOF',))]
