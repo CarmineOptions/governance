@@ -10,3 +10,4 @@ mod proposals;
 mod traits;
 mod types;
 mod upgrades;
+mod treasury;
