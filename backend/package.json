@@ -1,0 +1,25 @@
+{
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "npx tsx src/app.ts",
+    "test": "jest --testTimeout=20000"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "starknet": "^5.29.0",
+    "starknetid.js": "^3.2.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.12.12",
+    "@types/supertest": "^6.0.2",
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0",
+    "ts-jest": "^29.1.4",
+    "tsx": "^4.11.0",
+    "typescript": "^5.4.5"
+  }
+}
