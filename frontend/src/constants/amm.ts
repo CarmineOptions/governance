@@ -72,3 +72,7 @@ export const USDC_BASE_VALUE = BigInt(10) ** BigInt(USDC_DIGITS);
 export const BASE_MATH_64_61 = BigInt(2) ** BigInt(61);
 export const BASE_MATH_64 = BigInt(2) ** BigInt(64);
 export const USDC_PRECISSION = 1000;
+export const BASE_API_URL = "https://konoha.vote/discussion-api/api/"
+export const TEST_FILE: string = "QmVqyWcuoBpHvt5tT5Gw9eJz2qYJyGKw4NY4yEdFcopK69";
+
+

@@ -1,411 +1,728 @@
 export const abi = [
     {
-        name: "Governance",
-        type: "impl",
-        interface_name: "governance::contract::IGovernance",
+      "name": "Governance",
+      "type": "impl",
+      "interface_name": "konoha::contract::IGovernance"
     },
     {
-        name: "governance::contract::IGovernance",
-        type: "interface",
-        items: [
+      "name": "konoha::contract::IGovernance",
+      "type": "interface",
+      "items": [
+        {
+          "name": "get_governance_token_address",
+          "type": "function",
+          "inputs": [],
+          "outputs": [
             {
-                name: "get_governance_token_address",
-                type: "function",
-                inputs: [],
-                outputs: [
-                    {
-                        type: "core::starknet::contract_address::ContractAddress",
-                    },
-                ],
-                state_mutability: "view",
-            },
-            {
-                name: "get_amm_address",
-                type: "function",
-                inputs: [],
-                outputs: [
-                    {
-                        type: "core::starknet::contract_address::ContractAddress",
-                    },
-                ],
-                state_mutability: "view",
-            },
-        ],
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "state_mutability": "view"
+        }
+      ]
     },
     {
-        name: "Airdrop",
-        type: "impl",
-        interface_name: "governance::airdrop::IAirdrop",
+      "name": "Airdrop",
+      "type": "impl",
+      "interface_name": "konoha::airdrop::IAirdrop"
     },
     {
-        name: "governance::airdrop::IAirdrop",
-        type: "interface",
-        items: [
+      "name": "konoha::airdrop::IAirdrop",
+      "type": "interface",
+      "items": [
+        {
+          "name": "claim",
+          "type": "function",
+          "inputs": [
             {
-                name: "claim",
-                type: "function",
-                inputs: [
-                    {
-                        name: "claimee",
-                        type: "core::starknet::contract_address::ContractAddress",
-                    },
-                    {
-                        name: "amount",
-                        type: "core::integer::u128",
-                    },
-                    {
-                        name: "proof",
-                        type: "core::array::Array::<core::felt252>",
-                    },
-                ],
-                outputs: [],
-                state_mutability: "external",
+              "name": "claimee",
+              "type": "core::starknet::contract_address::ContractAddress"
             },
-        ],
+            {
+              "name": "amount",
+              "type": "core::integer::u128"
+            },
+            {
+              "name": "proof",
+              "type": "core::array::Array::<core::felt252>"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        }
+      ]
     },
     {
-        name: "Proposals",
-        type: "impl",
-        interface_name: "governance::proposals::IProposals",
+      "name": "Vesting",
+      "type": "impl",
+      "interface_name": "konoha::vesting::IVesting"
     },
     {
-        name: "governance::types::PropDetails",
-        type: "struct",
-        members: [
+      "name": "konoha::vesting::IVesting",
+      "type": "interface",
+      "items": [
+        {
+          "name": "vest",
+          "type": "function",
+          "inputs": [
             {
-                name: "payload",
-                type: "core::felt252",
+              "name": "grantee",
+              "type": "core::starknet::contract_address::ContractAddress"
             },
             {
-                name: "to_upgrade",
-                type: "core::felt252",
+              "name": "vested_timestamp",
+              "type": "core::integer::u64"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "name": "add_vesting_milestone",
+          "type": "function",
+          "inputs": [
+            {
+              "name": "vesting_timestamp",
+              "type": "core::integer::u64"
             },
-        ],
+            {
+              "name": "grantee",
+              "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+              "name": "amount",
+              "type": "core::integer::u128"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "name": "add_linear_vesting_schedule",
+          "type": "function",
+          "inputs": [
+            {
+              "name": "first_vest",
+              "type": "core::integer::u64"
+            },
+            {
+              "name": "period",
+              "type": "core::integer::u64"
+            },
+            {
+              "name": "increments_count",
+              "type": "core::integer::u16"
+            },
+            {
+              "name": "total_amount",
+              "type": "core::integer::u128"
+            },
+            {
+              "name": "grantee",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        }
+      ]
     },
     {
-        name: "governance::proposals::IProposals",
-        type: "interface",
-        items: [
-            {
-                name: "vote",
-                type: "function",
-                inputs: [
-                    {
-                        name: "prop_id",
-                        type: "core::felt252",
-                    },
-                    {
-                        name: "opinion",
-                        type: "core::felt252",
-                    },
-                ],
-                outputs: [],
-                state_mutability: "external",
-            },
-            {
-                name: "get_proposal_details",
-                type: "function",
-                inputs: [
-                    {
-                        name: "prop_id",
-                        type: "core::felt252",
-                    },
-                ],
-                outputs: [
-                    {
-                        type: "governance::types::PropDetails",
-                    },
-                ],
-                state_mutability: "view",
-            },
-            {
-                name: "get_vote_counts",
-                type: "function",
-                inputs: [
-                    {
-                        name: "prop_id",
-                        type: "core::felt252",
-                    },
-                ],
-                outputs: [
-                    {
-                        type: "(core::integer::u128, core::integer::u128)",
-                    },
-                ],
-                state_mutability: "view",
-            },
-            {
-                name: "submit_proposal",
-                type: "function",
-                inputs: [
-                    {
-                        name: "payload",
-                        type: "core::felt252",
-                    },
-                    {
-                        name: "to_upgrade",
-                        type: "core::integer::u64",
-                    },
-                ],
-                outputs: [
-                    {
-                        type: "core::felt252",
-                    },
-                ],
-                state_mutability: "external",
-            },
-            {
-                name: "get_proposal_status",
-                type: "function",
-                inputs: [
-                    {
-                        name: "prop_id",
-                        type: "core::felt252",
-                    },
-                ],
-                outputs: [
-                    {
-                        type: "core::felt252",
-                    },
-                ],
-                state_mutability: "view",
-            },
-            {
-                name: "get_live_proposals",
-                type: "function",
-                inputs: [],
-                outputs: [
-                    {
-                        type: "core::array::Array::<core::felt252>",
-                    },
-                ],
-                state_mutability: "view",
-            },
-            {
-                name: "get_user_voted",
-                type: "function",
-                inputs: [
-                    {
-                        name: "user_address",
-                        type: "core::starknet::contract_address::ContractAddress",
-                    },
-                    {
-                        name: "prop_id",
-                        type: "core::felt252",
-                    },
-                ],
-                outputs: [
-                    {
-                        type: "core::felt252",
-                    },
-                ],
-                state_mutability: "view",
-            },
-        ],
+      "name": "Proposals",
+      "type": "impl",
+      "interface_name": "konoha::proposals::IProposals"
     },
     {
-        name: "constructor",
-        type: "constructor",
-        inputs: [
-            {
-                name: "govtoken_address",
-                type: "core::starknet::contract_address::ContractAddress",
-            },
-        ],
+      "name": "konoha::types::PropDetails",
+      "type": "struct",
+      "members": [
+        {
+          "name": "payload",
+          "type": "core::felt252"
+        },
+        {
+          "name": "to_upgrade",
+          "type": "core::felt252"
+        }
+      ]
     },
     {
-        kind: "struct",
-        name: "governance::contract::Governance::Proposed",
-        type: "event",
-        members: [
-            {
-                kind: "data",
-                name: "prop_id",
-                type: "core::felt252",
-            },
-            {
-                kind: "data",
-                name: "payload",
-                type: "core::felt252",
-            },
-            {
-                kind: "data",
-                name: "to_upgrade",
-                type: "core::integer::u64",
-            },
-        ],
+      "name": "core::array::Span::<core::felt252>",
+      "type": "struct",
+      "members": [
+        {
+          "name": "snapshot",
+          "type": "@core::array::Array::<core::felt252>"
+        }
+      ]
     },
     {
-        kind: "struct",
-        name: "governance::contract::Governance::Voted",
-        type: "event",
-        members: [
-            {
-                kind: "data",
-                name: "prop_id",
-                type: "core::felt252",
-            },
-            {
-                kind: "data",
-                name: "voter",
-                type: "core::starknet::contract_address::ContractAddress",
-            },
-            {
-                kind: "data",
-                name: "opinion",
-                type: "core::felt252",
-            },
-        ],
+      "name": "core::bool",
+      "type": "enum",
+      "variants": [
+        {
+          "name": "False",
+          "type": "()"
+        },
+        {
+          "name": "True",
+          "type": "()"
+        }
+      ]
     },
     {
-        kind: "struct",
-        name: "governance::airdrop::airdrop::Claimed",
-        type: "event",
-        members: [
-            {
-                kind: "data",
-                name: "address",
-                type: "core::starknet::contract_address::ContractAddress",
-            },
-            {
-                kind: "data",
-                name: "received",
-                type: "core::integer::u128",
-            },
-        ],
+      "name": "konoha::types::CustomProposalConfig",
+      "type": "struct",
+      "members": [
+        {
+          "name": "target",
+          "type": "core::felt252"
+        },
+        {
+          "name": "selector",
+          "type": "core::felt252"
+        },
+        {
+          "name": "library_call",
+          "type": "core::bool"
+        }
+      ]
     },
     {
-        kind: "enum",
-        name: "governance::airdrop::airdrop::Event",
-        type: "event",
-        variants: [
+      "name": "konoha::proposals::IProposals",
+      "type": "interface",
+      "items": [
+        {
+          "name": "vote",
+          "type": "function",
+          "inputs": [
             {
-                kind: "nested",
-                name: "Claimed",
-                type: "governance::airdrop::airdrop::Claimed",
+              "name": "prop_id",
+              "type": "core::felt252"
             },
-        ],
+            {
+              "name": "opinion",
+              "type": "core::felt252"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "name": "get_proposal_details",
+          "type": "function",
+          "inputs": [
+            {
+              "name": "prop_id",
+              "type": "core::felt252"
+            }
+          ],
+          "outputs": [
+            {
+              "type": "konoha::types::PropDetails"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "name": "get_vote_counts",
+          "type": "function",
+          "inputs": [
+            {
+              "name": "prop_id",
+              "type": "core::felt252"
+            }
+          ],
+          "outputs": [
+            {
+              "type": "(core::integer::u128, core::integer::u128)"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "name": "submit_proposal",
+          "type": "function",
+          "inputs": [
+            {
+              "name": "payload",
+              "type": "core::felt252"
+            },
+            {
+              "name": "to_upgrade",
+              "type": "core::integer::u64"
+            }
+          ],
+          "outputs": [
+            {
+              "type": "core::felt252"
+            }
+          ],
+          "state_mutability": "external"
+        },
+        {
+          "name": "get_proposal_status",
+          "type": "function",
+          "inputs": [
+            {
+              "name": "prop_id",
+              "type": "core::felt252"
+            }
+          ],
+          "outputs": [
+            {
+              "type": "core::felt252"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "name": "get_live_proposals",
+          "type": "function",
+          "inputs": [],
+          "outputs": [
+            {
+              "type": "core::array::Array::<core::felt252>"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "name": "get_user_voted",
+          "type": "function",
+          "inputs": [
+            {
+              "name": "user_address",
+              "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+              "name": "prop_id",
+              "type": "core::felt252"
+            }
+          ],
+          "outputs": [
+            {
+              "type": "core::felt252"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "name": "submit_custom_proposal",
+          "type": "function",
+          "inputs": [
+            {
+              "name": "custom_proposal_type",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "calldata",
+              "type": "core::array::Span::<core::felt252>"
+            }
+          ],
+          "outputs": [
+            {
+              "type": "core::integer::u32"
+            }
+          ],
+          "state_mutability": "external"
+        },
+        {
+          "name": "get_custom_proposal_type",
+          "type": "function",
+          "inputs": [
+            {
+              "name": "i",
+              "type": "core::integer::u32"
+            }
+          ],
+          "outputs": [
+            {
+              "type": "konoha::types::CustomProposalConfig"
+            }
+          ],
+          "state_mutability": "view"
+        }
+      ]
     },
     {
-        kind: "struct",
-        name: "governance::proposals::proposals::Proposed",
-        type: "event",
-        members: [
-            {
-                kind: "data",
-                name: "prop_id",
-                type: "core::felt252",
-            },
-            {
-                kind: "data",
-                name: "payload",
-                type: "core::felt252",
-            },
-            {
-                kind: "data",
-                name: "to_upgrade",
-                type: "core::integer::u64",
-            },
-        ],
+      "name": "Upgrades",
+      "type": "impl",
+      "interface_name": "konoha::upgrades::IUpgrades"
     },
     {
-        kind: "struct",
-        name: "governance::proposals::proposals::Voted",
-        type: "event",
-        members: [
+      "name": "konoha::upgrades::IUpgrades",
+      "type": "interface",
+      "items": [
+        {
+          "name": "apply_passed_proposal",
+          "type": "function",
+          "inputs": [
             {
-                kind: "data",
-                name: "prop_id",
-                type: "core::felt252",
-            },
-            {
-                kind: "data",
-                name: "voter",
-                type: "core::starknet::contract_address::ContractAddress",
-            },
-            {
-                kind: "data",
-                name: "opinion",
-                type: "core::felt252",
-            },
-        ],
+              "name": "prop_id",
+              "type": "core::felt252"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        }
+      ]
     },
     {
-        kind: "enum",
-        name: "governance::proposals::proposals::Event",
-        type: "event",
-        variants: [
-            {
-                kind: "nested",
-                name: "Proposed",
-                type: "governance::proposals::proposals::Proposed",
-            },
-            {
-                kind: "nested",
-                name: "Voted",
-                type: "governance::proposals::proposals::Voted",
-            },
-        ],
+      "name": "Discussions",
+      "type": "impl",
+      "interface_name": "konoha::discussion::IDiscussion"
     },
     {
-        kind: "struct",
-        name: "governance::upgrades::upgrades::Upgraded",
-        type: "event",
-        members: [
-            {
-                kind: "data",
-                name: "prop_id",
-                type: "core::integer::u64",
-            },
-            {
-                kind: "data",
-                name: "upgrade_type",
-                type: "core::integer::u64",
-            },
-        ],
+      "name": "core::byte_array::ByteArray",
+      "type": "struct",
+      "members": [
+        {
+          "name": "data",
+          "type": "core::array::Array::<core::bytes_31::bytes31>"
+        },
+        {
+          "name": "pending_word",
+          "type": "core::felt252"
+        },
+        {
+          "name": "pending_word_len",
+          "type": "core::integer::u32"
+        }
+      ]
     },
     {
-        kind: "enum",
-        name: "governance::upgrades::upgrades::Event",
-        type: "event",
-        variants: [
-            {
-                kind: "nested",
-                name: "Upgraded",
-                type: "governance::upgrades::upgrades::Upgraded",
-            },
-        ],
+      "name": "konoha::types::Comment",
+      "type": "struct",
+      "members": [
+        {
+          "name": "user",
+          "type": "core::starknet::contract_address::ContractAddress"
+        },
+        {
+          "name": "ipfs_hash",
+          "type": "core::byte_array::ByteArray"
+        }
+      ]
     },
     {
-        kind: "enum",
-        name: "governance::contract::Governance::Event",
-        type: "event",
-        variants: [
+      "name": "konoha::discussion::IDiscussion",
+      "type": "interface",
+      "items": [
+        {
+          "name": "add_comment",
+          "type": "function",
+          "inputs": [
             {
-                kind: "nested",
-                name: "Proposed",
-                type: "governance::contract::Governance::Proposed",
+              "name": "prop_id",
+              "type": "core::integer::u32"
             },
             {
-                kind: "nested",
-                name: "Voted",
-                type: "governance::contract::Governance::Voted",
-            },
+              "name": "ipfs_hash",
+              "type": "core::byte_array::ByteArray"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "name": "get_comments",
+          "type": "function",
+          "inputs": [
             {
-                kind: "nested",
-                name: "AirdropEvent",
-                type: "governance::airdrop::airdrop::Event",
-            },
+              "name": "prop_id",
+              "type": "core::integer::u32"
+            }
+          ],
+          "outputs": [
             {
-                kind: "nested",
-                name: "ProposalsEvent",
-                type: "governance::proposals::proposals::Event",
-            },
-            {
-                kind: "nested",
-                name: "UpgradesEvent",
-                type: "governance::upgrades::upgrades::Event",
-            },
-        ],
+              "type": "core::array::Array::<konoha::types::Comment>"
+            }
+          ],
+          "state_mutability": "view"
+        }
+      ]
     },
-];
+    {
+      "name": "constructor",
+      "type": "constructor",
+      "inputs": [
+        {
+          "name": "govtoken_address",
+          "type": "core::starknet::contract_address::ContractAddress"
+        }
+      ]
+    },
+    {
+      "kind": "struct",
+      "name": "konoha::contract::Governance::Proposed",
+      "type": "event",
+      "members": [
+        {
+          "kind": "data",
+          "name": "prop_id",
+          "type": "core::felt252"
+        },
+        {
+          "kind": "data",
+          "name": "payload",
+          "type": "core::felt252"
+        },
+        {
+          "kind": "data",
+          "name": "to_upgrade",
+          "type": "core::integer::u64"
+        }
+      ]
+    },
+    {
+      "kind": "struct",
+      "name": "konoha::contract::Governance::Voted",
+      "type": "event",
+      "members": [
+        {
+          "kind": "data",
+          "name": "prop_id",
+          "type": "core::felt252"
+        },
+        {
+          "kind": "data",
+          "name": "voter",
+          "type": "core::starknet::contract_address::ContractAddress"
+        },
+        {
+          "kind": "data",
+          "name": "opinion",
+          "type": "core::felt252"
+        }
+      ]
+    },
+    {
+      "kind": "struct",
+      "name": "konoha::airdrop::airdrop::Claimed",
+      "type": "event",
+      "members": [
+        {
+          "kind": "data",
+          "name": "address",
+          "type": "core::starknet::contract_address::ContractAddress"
+        },
+        {
+          "kind": "data",
+          "name": "received",
+          "type": "core::integer::u128"
+        }
+      ]
+    },
+    {
+      "kind": "enum",
+      "name": "konoha::airdrop::airdrop::Event",
+      "type": "event",
+      "variants": [
+        {
+          "kind": "nested",
+          "name": "Claimed",
+          "type": "konoha::airdrop::airdrop::Claimed"
+        }
+      ]
+    },
+    {
+      "kind": "struct",
+      "name": "konoha::vesting::vesting::VestingMilestoneAdded",
+      "type": "event",
+      "members": [
+        {
+          "kind": "data",
+          "name": "grantee",
+          "type": "core::starknet::contract_address::ContractAddress"
+        },
+        {
+          "kind": "data",
+          "name": "timestamp",
+          "type": "core::integer::u64"
+        },
+        {
+          "kind": "data",
+          "name": "amount",
+          "type": "core::integer::u128"
+        }
+      ]
+    },
+    {
+      "kind": "struct",
+      "name": "konoha::vesting::vesting::Vested",
+      "type": "event",
+      "members": [
+        {
+          "kind": "data",
+          "name": "grantee",
+          "type": "core::starknet::contract_address::ContractAddress"
+        },
+        {
+          "kind": "data",
+          "name": "timestamp",
+          "type": "core::integer::u64"
+        },
+        {
+          "kind": "data",
+          "name": "amount",
+          "type": "core::integer::u128"
+        }
+      ]
+    },
+    {
+      "kind": "enum",
+      "name": "konoha::vesting::vesting::Event",
+      "type": "event",
+      "variants": [
+        {
+          "kind": "nested",
+          "name": "VestingMilestoneAdded",
+          "type": "konoha::vesting::vesting::VestingMilestoneAdded"
+        },
+        {
+          "kind": "nested",
+          "name": "Vested",
+          "type": "konoha::vesting::vesting::Vested"
+        }
+      ]
+    },
+    {
+      "kind": "struct",
+      "name": "konoha::proposals::proposals::Proposed",
+      "type": "event",
+      "members": [
+        {
+          "kind": "data",
+          "name": "prop_id",
+          "type": "core::felt252"
+        },
+        {
+          "kind": "data",
+          "name": "payload",
+          "type": "core::felt252"
+        },
+        {
+          "kind": "data",
+          "name": "to_upgrade",
+          "type": "core::integer::u64"
+        }
+      ]
+    },
+    {
+      "kind": "struct",
+      "name": "konoha::proposals::proposals::Voted",
+      "type": "event",
+      "members": [
+        {
+          "kind": "data",
+          "name": "prop_id",
+          "type": "core::felt252"
+        },
+        {
+          "kind": "data",
+          "name": "voter",
+          "type": "core::starknet::contract_address::ContractAddress"
+        },
+        {
+          "kind": "data",
+          "name": "opinion",
+          "type": "core::felt252"
+        }
+      ]
+    },
+    {
+      "kind": "enum",
+      "name": "konoha::proposals::proposals::Event",
+      "type": "event",
+      "variants": [
+        {
+          "kind": "nested",
+          "name": "Proposed",
+          "type": "konoha::proposals::proposals::Proposed"
+        },
+        {
+          "kind": "nested",
+          "name": "Voted",
+          "type": "konoha::proposals::proposals::Voted"
+        }
+      ]
+    },
+    {
+      "kind": "struct",
+      "name": "konoha::upgrades::upgrades::Upgraded",
+      "type": "event",
+      "members": [
+        {
+          "kind": "data",
+          "name": "prop_id",
+          "type": "core::integer::u64"
+        },
+        {
+          "kind": "data",
+          "name": "upgrade_type",
+          "type": "core::integer::u64"
+        }
+      ]
+    },
+    {
+      "kind": "enum",
+      "name": "konoha::upgrades::upgrades::Event",
+      "type": "event",
+      "variants": [
+        {
+          "kind": "nested",
+          "name": "Upgraded",
+          "type": "konoha::upgrades::upgrades::Upgraded"
+        }
+      ]
+    },
+    {
+      "kind": "enum",
+      "name": "konoha::discussion::discussion::Event",
+      "type": "event",
+      "variants": []
+    },
+    {
+      "kind": "enum",
+      "name": "konoha::contract::Governance::Event",
+      "type": "event",
+      "variants": [
+        {
+          "kind": "nested",
+          "name": "Proposed",
+          "type": "konoha::contract::Governance::Proposed"
+        },
+        {
+          "kind": "nested",
+          "name": "Voted",
+          "type": "konoha::contract::Governance::Voted"
+        },
+        {
+          "kind": "nested",
+          "name": "AirdropEvent",
+          "type": "konoha::airdrop::airdrop::Event"
+        },
+        {
+          "kind": "nested",
+          "name": "VestingEvent",
+          "type": "konoha::vesting::vesting::Event"
+        },
+        {
+          "kind": "nested",
+          "name": "ProposalsEvent",
+          "type": "konoha::proposals::proposals::Event"
+        },
+        {
+          "kind": "nested",
+          "name": "UpgradesEvent",
+          "type": "konoha::upgrades::upgrades::Event"
+        },
+        {
+          "kind": "nested",
+          "name": "DiscussionEvent",
+          "type": "konoha::discussion::discussion::Event"
+        }
+      ]
+    }
+  ]
