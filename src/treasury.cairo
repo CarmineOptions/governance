@@ -29,12 +29,18 @@ trait ITreasury<TContractState> {
     fn get_amm_address(self: @TContractState) -> ContractAddress;
     fn deposit_to_zklend(ref self: TContractState, token: ContractAddress, amount: u256);
     fn withdraw_from_zklend(ref self: TContractState, token: ContractAddress, amount: u256);
-    fn deposit_to_nostra_lending_pool(
-        ref self: TContractState, token: ContractAddress, nostraToken: ContractAddress, amount: u256
-    );
-    fn withdraw_from_nostra_lending_pool(
-        ref self: TContractState, nostraToken: ContractAddress, amount: u256
-    );
+
+    fn deposit_eth_to_nostra_lending_pool(ref self: TContractState, amount: u256);
+    fn deposit_usdt_to_nostra_lending_pool(ref self: TContractState, amount: u256);
+    fn deposit_strk_to_nostra_lending_pool(ref self: TContractState, amount: u256);
+    fn deposit_usdc_to_nostra_lending_pool(ref self: TContractState, amount: u256);
+    fn deposit_wbtc_to_nostra_lending_pool(ref self: TContractState, amount: u256);
+
+    fn withdraw_eth_from_nostra_lending_pool(ref self: TContractState, amount: u256);
+    fn withdraw_usdt_from_nostra_lending_pool(ref self: TContractState, amount: u256);
+    fn withdraw_strk_from_nostra_lending_pool(ref self: TContractState, amount: u256);
+    fn withdraw_usdc_from_nostra_lending_pool(ref self: TContractState, amount: u256);
+    fn withdraw_wbtc_from_nostra_lending_pool(ref self: TContractState, amount: u256);
 }
 
 #[starknet::contract]
@@ -43,6 +49,7 @@ mod Treasury {
     use core::starknet::event::EventEmitter;
     use core::traits::TryInto;
     use konoha::airdrop::{IAirdropDispatcher, IAirdropDispatcherTrait};
+    use konoha::constants;
     use konoha::traits::{IERC20Dispatcher, IERC20DispatcherTrait};
     use konoha::treasury_types::carmine::{IAMMDispatcher, IAMMDispatcherTrait};
     use konoha::treasury_types::nostra::interface::{
@@ -312,7 +319,102 @@ mod Treasury {
             self.emit(LiquidityWithdrawnFromZklend { token_address: token, amount });
         }
 
-        //Deposit token to Nostra lending pool
+        // deposit to nostra lending pool
+
+        fn deposit_eth_to_nostra_lending_pool(ref self: ContractState, amount: u256) {
+            self
+                .deposit_to_nostra_lending_pool(
+                    constants::ETH_ADDRESS.try_into().unwrap(),
+                    constants::NOSTRA_INTREST_BEARING_ETH.try_into().unwrap(),
+                    amount
+                );
+        }
+
+        fn deposit_usdt_to_nostra_lending_pool(ref self: ContractState, amount: u256) {
+            self
+                .deposit_to_nostra_lending_pool(
+                    constants::USDT_ADDRESS.try_into().unwrap(),
+                    constants::NOSTRA_INTREST_BEARING_USDT.try_into().unwrap(),
+                    amount
+                );
+        }
+
+        fn deposit_strk_to_nostra_lending_pool(ref self: ContractState, amount: u256) {
+            self
+                .deposit_to_nostra_lending_pool(
+                    constants::STRK_ADDRESS.try_into().unwrap(),
+                    constants::NOSTRA_INTREST_BEARING_STRK.try_into().unwrap(),
+                    amount
+                );
+        }
+
+        fn deposit_usdc_to_nostra_lending_pool(ref self: ContractState, amount: u256) {
+            self
+                .deposit_to_nostra_lending_pool(
+                    constants::USDC_ADDRESS.try_into().unwrap(),
+                    constants::NOSTRA_INTREST_BEARING_USDC.try_into().unwrap(),
+                    amount
+                );
+        }
+
+        fn deposit_wbtc_to_nostra_lending_pool(ref self: ContractState, amount: u256) {
+            self
+                .deposit_to_nostra_lending_pool(
+                    constants::WBTC_ADDRESS.try_into().unwrap(),
+                    constants::NOSTRA_INTREST_BEARING_WBTC.try_into().unwrap(),
+                    amount
+                );
+        }
+
+        // withdraw from nostra lending pool
+
+        fn withdraw_eth_from_nostra_lending_pool(ref self: ContractState, amount: u256) {
+            self
+                .withdraw_from_nostra_lending_pool(
+                    constants::NOSTRA_INTREST_BEARING_ETH.try_into().unwrap(), amount
+                );
+        }
+
+        fn withdraw_usdt_from_nostra_lending_pool(ref self: ContractState, amount: u256) {
+            self
+                .withdraw_from_nostra_lending_pool(
+                    constants::NOSTRA_INTREST_BEARING_USDT.try_into().unwrap(), amount
+                );
+        }
+
+        fn withdraw_strk_from_nostra_lending_pool(ref self: ContractState, amount: u256) {
+            self
+                .withdraw_from_nostra_lending_pool(
+                    constants::NOSTRA_INTREST_BEARING_STRK.try_into().unwrap(), amount
+                );
+        }
+
+        fn withdraw_usdc_from_nostra_lending_pool(ref self: ContractState, amount: u256) {
+            self
+                .withdraw_from_nostra_lending_pool(
+                    constants::NOSTRA_INTREST_BEARING_USDC.try_into().unwrap(), amount
+                );
+        }
+
+        fn withdraw_wbtc_from_nostra_lending_pool(ref self: ContractState, amount: u256) {
+            self
+                .withdraw_from_nostra_lending_pool(
+                    constants::NOSTRA_INTREST_BEARING_WBTC.try_into().unwrap(), amount
+                );
+        }
+    }
+
+
+    #[abi(embed_v0)]
+    impl UpgradeableImpl of IUpgradeable<ContractState> {
+        fn upgrade(ref self: ContractState, new_class_hash: ClassHash) {
+            self.ownable.assert_only_owner();
+            self.upgradeable._upgrade(new_class_hash);
+        }
+    }
+
+    #[generate_trait]
+    impl NostraLendingPoolImpl of NostraLendingPoolTrait {
         fn deposit_to_nostra_lending_pool(
             ref self: ContractState,
             token: ContractAddress,
@@ -337,7 +439,6 @@ mod Treasury {
             self.emit(DepositToNostraLendingPool { nostra_token: nostraToken, amount });
         }
 
-        // Withdraw token from Nostra lending pool
         fn withdraw_from_nostra_lending_pool(
             ref self: ContractState, nostraToken: ContractAddress, amount: u256
         ) {
@@ -354,15 +455,6 @@ mod Treasury {
             nostra_market.burn(get_contract_address(), get_contract_address(), amount);
 
             self.emit(WithdrawFromNostraLendingPool { nostra_token: nostraToken, amount });
-        }
-    }
-
-
-    #[abi(embed_v0)]
-    impl UpgradeableImpl of IUpgradeable<ContractState> {
-        fn upgrade(ref self: ContractState, new_class_hash: ClassHash) {
-            self.ownable.assert_only_owner();
-            self.upgradeable._upgrade(new_class_hash);
         }
     }
 }
