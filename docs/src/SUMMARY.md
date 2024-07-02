@@ -1,6 +1,7 @@
 # Summary
 
 [About Konoha](./about.md)
+[Customizing](./customizing.md)
 
 # Feature Guide
 - [Proposals](./proposals.md)
