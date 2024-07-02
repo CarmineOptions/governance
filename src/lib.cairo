@@ -5,6 +5,7 @@ mod discussion;
 mod merkle_tree;
 mod proposals;
 mod staking;
+mod streaming;
 mod token;
 mod traits;
 mod treasury;

@@ -28,7 +28,7 @@ block_id.tag = "Latest"
 
 [[tool.snforge.fork]]
 name = "SEPOLIA"
-url = "http://34.22.208.73:6062/v0_7"
+url = "http://178.32.172.148:6062/v0_7"
 block_id.tag = "Latest"
 
 RUST_BACKTRACE = 1
