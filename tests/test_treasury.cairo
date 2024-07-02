@@ -6,6 +6,7 @@ use core::result::ResultTrait;
 use core::serde::Serde;
 use core::traits::{TryInto, Into};
 use debug::PrintTrait;
+use konoha::constants;
 use konoha::traits::{IERC20Dispatcher, IERC20DispatcherTrait};
 use konoha::treasury::{ITreasuryDispatcher, ITreasuryDispatcherTrait};
 use konoha::treasury_types::carmine::{IAMMDispatcher, IAMMDispatcherTrait};
@@ -311,3 +312,263 @@ fn test_deposit_withdraw_zklend() {
 
     assert(bal_before_withdraw == bal_after_withdraw - deposit_amt, 'deposit to zklend failed');
 }
+
+#[test]
+#[fork("MAINNET")]
+fn test_deposit_withdraw_usdc_nostra_lending_pool() {
+    let (gov_contract_address, _, treasury_contract_address, _) = get_important_addresses();
+
+    let random_whale: ContractAddress =
+        0x4267ae838da77a52384283f3321a0746557023d24cb823115d2da5c8c4f1a42
+        .try_into()
+        .unwrap();
+    let usdc_dispatcher = IERC20Dispatcher {
+        contract_address: constants::USDC_ADDRESS.try_into().unwrap()
+    };
+    let treasury_dispatcher = ITreasuryDispatcher { contract_address: treasury_contract_address };
+
+    // Transfer USDC from random whale to Treasury contract
+    prank(
+        CheatTarget::One(constants::USDC_ADDRESS.try_into().unwrap()),
+        random_whale,
+        CheatSpan::TargetCalls(1)
+    );
+    let deposit_amt = 2000000; // 2 USDC
+    usdc_dispatcher.transfer(treasury_contract_address, deposit_amt);
+    assert(usdc_dispatcher.balanceOf(treasury_contract_address) >= deposit_amt, 'usdc bal too low');
+
+    // Deposit to Nostra lending pool
+    let bal_before_deposit = usdc_dispatcher.balanceOf(treasury_contract_address);
+    prank(
+        CheatTarget::One(treasury_contract_address), gov_contract_address, CheatSpan::TargetCalls(2)
+    );
+    treasury_dispatcher.deposit_usdc_to_nostra_lending_pool(deposit_amt.try_into().unwrap());
+
+    let bal_after_deposit = usdc_dispatcher.balanceOf(treasury_contract_address);
+
+    assert(bal_before_deposit == bal_after_deposit + deposit_amt, 'deposit to nostra failed');
+
+    roll(
+        CheatTarget::All, get_block_number() + 1, CheatSpan::Indefinite
+    ); // to bypass sandwich guard
+
+    // Withdraw from Nostra lending pool
+    let bal_before_withdraw = usdc_dispatcher.balanceOf(treasury_contract_address);
+
+    treasury_dispatcher.withdraw_usdc_from_nostra_lending_pool(deposit_amt.try_into().unwrap());
+
+    let bal_after_withdraw = usdc_dispatcher.balanceOf(treasury_contract_address);
+
+    assert(
+        bal_before_withdraw == bal_after_withdraw - deposit_amt, 'withdrawal from nostra failed'
+    );
+}
+
+
+#[test]
+#[fork("MAINNET")]
+fn test_deposit_withdraw_eth_nostra_lending_pool() {
+    let (gov_contract_address, _, treasury_contract_address, _) = get_important_addresses();
+
+    let random_whale: ContractAddress =
+        0x4267ae838da77a52384283f3321a0746557023d24cb823115d2da5c8c4f1a42
+        .try_into()
+        .unwrap();
+    let eth_dispatcher = IERC20Dispatcher {
+        contract_address: constants::ETH_ADDRESS.try_into().unwrap()
+    };
+    let treasury_dispatcher = ITreasuryDispatcher { contract_address: treasury_contract_address };
+
+    // Transfer ETH from random whale to Treasury contract
+    prank(
+        CheatTarget::One(constants::ETH_ADDRESS.try_into().unwrap()),
+        random_whale,
+        CheatSpan::TargetCalls(1)
+    );
+    let deposit_amt = 200000000000000; // 0.0002 eth
+    eth_dispatcher.transfer(treasury_contract_address, deposit_amt);
+    assert(eth_dispatcher.balanceOf(treasury_contract_address) >= deposit_amt, 'eth bal too low');
+
+    // Deposit to Nostra lending pool
+    let bal_before_deposit = eth_dispatcher.balanceOf(treasury_contract_address);
+    prank(
+        CheatTarget::One(treasury_contract_address), gov_contract_address, CheatSpan::TargetCalls(2)
+    );
+    treasury_dispatcher.deposit_eth_to_nostra_lending_pool(deposit_amt.try_into().unwrap());
+
+    let bal_after_deposit = eth_dispatcher.balanceOf(treasury_contract_address);
+
+    assert(bal_before_deposit == bal_after_deposit + deposit_amt, 'deposit to nostra failed');
+
+    roll(
+        CheatTarget::All, get_block_number() + 1, CheatSpan::Indefinite
+    ); // to bypass sandwich guard
+
+    // Withdraw from Nostra lending pool
+    let bal_before_withdraw = eth_dispatcher.balanceOf(treasury_contract_address);
+
+    treasury_dispatcher.withdraw_eth_from_nostra_lending_pool(deposit_amt.try_into().unwrap());
+
+    let bal_after_withdraw = eth_dispatcher.balanceOf(treasury_contract_address);
+
+    assert(
+        bal_before_withdraw == bal_after_withdraw - deposit_amt, 'withdrawal from nostra failed'
+    );
+}
+
+
+#[test]
+#[fork("MAINNET")]
+fn test_deposit_withdraw_strk_nostra_lending_pool() {
+    let (gov_contract_address, _, treasury_contract_address, _) = get_important_addresses();
+
+    let random_whale: ContractAddress =
+        0x4267ae838da77a52384283f3321a0746557023d24cb823115d2da5c8c4f1a42
+        .try_into()
+        .unwrap();
+    let strk_dispatcher = IERC20Dispatcher {
+        contract_address: constants::STRK_ADDRESS.try_into().unwrap()
+    };
+    let treasury_dispatcher = ITreasuryDispatcher { contract_address: treasury_contract_address };
+
+    // Transfer STRK from random whale to Treasury contract
+    prank(
+        CheatTarget::One(constants::STRK_ADDRESS.try_into().unwrap()),
+        random_whale,
+        CheatSpan::TargetCalls(1)
+    );
+    let deposit_amt = 2000000000000000000; // 2 STRK
+    strk_dispatcher.transfer(treasury_contract_address, deposit_amt);
+    assert(strk_dispatcher.balanceOf(treasury_contract_address) >= deposit_amt, 'strk bal too low');
+
+    // Deposit to Nostra lending pool
+    let bal_before_deposit = strk_dispatcher.balanceOf(treasury_contract_address);
+    prank(
+        CheatTarget::One(treasury_contract_address), gov_contract_address, CheatSpan::TargetCalls(2)
+    );
+    treasury_dispatcher.deposit_strk_to_nostra_lending_pool(deposit_amt.try_into().unwrap());
+
+    let bal_after_deposit = strk_dispatcher.balanceOf(treasury_contract_address);
+
+    assert(bal_before_deposit == bal_after_deposit + deposit_amt, 'deposit to nostra failed');
+
+    roll(
+        CheatTarget::All, get_block_number() + 1, CheatSpan::Indefinite
+    ); // to bypass sandwich guard
+
+    // Withdraw from Nostra lending pool
+    let bal_before_withdraw = strk_dispatcher.balanceOf(treasury_contract_address);
+
+    treasury_dispatcher.withdraw_strk_from_nostra_lending_pool(deposit_amt.try_into().unwrap());
+
+    let bal_after_withdraw = strk_dispatcher.balanceOf(treasury_contract_address);
+
+    assert(
+        bal_before_withdraw == bal_after_withdraw - deposit_amt, 'withdrawal from nostra failed'
+    );
+}
+
+#[test]
+#[fork("MAINNET")]
+fn test_deposit_withdraw_usdt_nostra_lending_pool() {
+    let (gov_contract_address, _, treasury_contract_address, _) = get_important_addresses();
+
+    let random_whale: ContractAddress =
+        0x00c318445d5a5096e2ad086452d5c97f65a9d28cafe343345e0fa70da0841295
+        .try_into()
+        .unwrap();
+
+    let usdt_dispatcher = IERC20Dispatcher {
+        contract_address: constants::USDT_ADDRESS.try_into().unwrap()
+    };
+    let treasury_dispatcher = ITreasuryDispatcher { contract_address: treasury_contract_address };
+
+    // Transfer USDT from random whale to Treasury contract
+    prank(
+        CheatTarget::One(constants::USDT_ADDRESS.try_into().unwrap()),
+        random_whale,
+        CheatSpan::TargetCalls(1)
+    );
+    let deposit_amt = 2000000; // 2 USDT
+    usdt_dispatcher.transfer(treasury_contract_address, deposit_amt);
+    assert(usdt_dispatcher.balanceOf(treasury_contract_address) >= deposit_amt, 'usdt bal too low');
+
+    // Deposit to Nostra lending pool
+    let bal_before_deposit = usdt_dispatcher.balanceOf(treasury_contract_address);
+    prank(
+        CheatTarget::One(treasury_contract_address), gov_contract_address, CheatSpan::TargetCalls(2)
+    );
+    treasury_dispatcher.deposit_usdt_to_nostra_lending_pool(deposit_amt.try_into().unwrap());
+
+    let bal_after_deposit = usdt_dispatcher.balanceOf(treasury_contract_address);
+
+    assert(bal_before_deposit == bal_after_deposit + deposit_amt, 'deposit to nostra failed');
+
+    roll(
+        CheatTarget::All, get_block_number() + 1, CheatSpan::Indefinite
+    ); // to bypass sandwich guard
+
+    // Withdraw from Nostra lending pool
+    let bal_before_withdraw = usdt_dispatcher.balanceOf(treasury_contract_address);
+
+    treasury_dispatcher.withdraw_usdt_from_nostra_lending_pool(deposit_amt.try_into().unwrap());
+
+    let bal_after_withdraw = usdt_dispatcher.balanceOf(treasury_contract_address);
+
+    assert(
+        bal_before_withdraw == bal_after_withdraw - deposit_amt, 'withdrawal from nostra failed'
+    );
+}
+
+#[test]
+#[fork("MAINNET")]
+fn test_deposit_withdraw_wbtc_nostra_lending_pool() {
+    let (gov_contract_address, _, treasury_contract_address, _) = get_important_addresses();
+
+    let random_whale: ContractAddress =
+        0x01583919ffd78e87fa28fdf6b6a805fe3ddf52f754a63721dcd4c258211129a6
+        .try_into()
+        .unwrap();
+
+    let wbtc_dispatcher = IERC20Dispatcher {
+        contract_address: constants::WBTC_ADDRESS.try_into().unwrap()
+    };
+    let treasury_dispatcher = ITreasuryDispatcher { contract_address: treasury_contract_address };
+
+    // Transfer WBTC from random whale to Treasury contract
+    prank(
+        CheatTarget::One(constants::WBTC_ADDRESS.try_into().unwrap()),
+        random_whale,
+        CheatSpan::TargetCalls(1)
+    );
+    let deposit_amt = 200000000; // 2 WBTC
+    wbtc_dispatcher.transfer(treasury_contract_address, deposit_amt);
+    assert(wbtc_dispatcher.balanceOf(treasury_contract_address) >= deposit_amt, 'wbtc bal too low');
+
+    // Deposit to Nostra lending pool
+    let bal_before_deposit = wbtc_dispatcher.balanceOf(treasury_contract_address);
+    prank(
+        CheatTarget::One(treasury_contract_address), gov_contract_address, CheatSpan::TargetCalls(2)
+    );
+    treasury_dispatcher.deposit_wbtc_to_nostra_lending_pool(deposit_amt.try_into().unwrap());
+
+    let bal_after_deposit = wbtc_dispatcher.balanceOf(treasury_contract_address);
+
+    assert(bal_before_deposit == bal_after_deposit + deposit_amt, 'deposit to nostra failed');
+
+    roll(
+        CheatTarget::All, get_block_number() + 1, CheatSpan::Indefinite
+    ); // to bypass sandwich guard
+
+    // Withdraw from Nostra lending pool
+    let bal_before_withdraw = wbtc_dispatcher.balanceOf(treasury_contract_address);
+
+    treasury_dispatcher.withdraw_wbtc_from_nostra_lending_pool(deposit_amt.try_into().unwrap());
+
+    let bal_after_withdraw = wbtc_dispatcher.balanceOf(treasury_contract_address);
+
+    assert(
+        bal_before_withdraw == bal_after_withdraw - deposit_amt, 'withdrawal from nostra failed'
+    );
+}
+

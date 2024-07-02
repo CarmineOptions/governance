@@ -17,4 +17,7 @@ mod treasury_types {
     mod zklend {
         mod interfaces;
     }
+    mod nostra {
+        mod interface;
+    }
 }
