@@ -29,13 +29,11 @@ trait ITreasury<TContractState> {
     fn get_amm_address(self: @TContractState) -> ContractAddress;
     fn deposit_to_zklend(ref self: TContractState, token: ContractAddress, amount: u256);
     fn withdraw_from_zklend(ref self: TContractState, token: ContractAddress, amount: u256);
-
     fn deposit_eth_to_nostra_lending_pool(ref self: TContractState, amount: u256);
     fn deposit_usdt_to_nostra_lending_pool(ref self: TContractState, amount: u256);
     fn deposit_strk_to_nostra_lending_pool(ref self: TContractState, amount: u256);
     fn deposit_usdc_to_nostra_lending_pool(ref self: TContractState, amount: u256);
     fn deposit_wbtc_to_nostra_lending_pool(ref self: TContractState, amount: u256);
-
     fn withdraw_eth_from_nostra_lending_pool(ref self: TContractState, amount: u256);
     fn withdraw_usdt_from_nostra_lending_pool(ref self: TContractState, amount: u256);
     fn withdraw_strk_from_nostra_lending_pool(ref self: TContractState, amount: u256);
